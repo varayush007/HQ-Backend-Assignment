@@ -1,45 +1,21 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
 const dotenv = require('dotenv');
-const socketio = require('socket.io');
-
 const app = express();
-const server = require('http').Server(app);
-const io = socketio(server);
+const PORT = process.env.PORT || 3000;
+const {chats} = require('./data/data');
 
-dotenv.config();
-const port = process.env.PORT || 5000;
+app.get("/",(req,res)=>{
+    res.send("API is running");
+})
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-const connection = mongoose.connection;
-connection.once('open', () => {
-  console.log('MongoDB connection established successfully');
-});
+app.get("/api/chat", (req,res)=>{
+    res.send(chats);
+})
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+app.get("/api/chat/:id", (req,res)=>{
+    console.log(req.params.id);
+    const singleuserchat  = chats.find((chat)=>chat._id === req.params.id);
+    res.send(singleuserchat);
+})
 
-// API Routes
-const messagesRouter = require('./routes/messages');
-app.use('/messages', messagesRouter);
-
-// Start server
-server.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
-// Socket.IO
-io.on('connection', (socket) => {
-  console.log(`Socket ${socket.id} connected`);
-
-  socket.on('sendMessage', (message) => {
-    io.emit('message', message);
-  });
-
-  socket.on('disconnect', () => {
-    console.log(`Socket ${socket.id} disconnected`);
-  });
-});
+app.listen(PORT, console.log(`Server Started on PORT ${PORT}!!`));
