@@ -1,7 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 const {chats} = require('./data/data');
 
 app.get("/",(req,res)=>{
